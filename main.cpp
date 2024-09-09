@@ -91,6 +91,7 @@ int main()
 
             if (!gameOver)
             {
+                currMode = 0;
                 // Controls
 
                 // Directions
@@ -162,6 +163,13 @@ int main()
             }
             else
             {
+
+                // Gameover
+                const char *options[] = {
+                    "PLAY AGAIN",
+                    "MAIN MENU",
+                    "QUIT"};
+                int modes = sizeof(options) / sizeof(options[0]), spacing = ((screenHeight - 2 * boxOffset) - (modes)*fontSize) / (modes + 1);
                 BeginDrawing();
                 ClearBackground(BLACK);
                 for (int i = 1; i < snake.size(); i++)
@@ -172,23 +180,54 @@ int main()
                 DrawText(TextFormat("GAMEOVER"), (screenWidth - MeasureText(TextFormat("GAMEOVER"), fontSize * 3)) / 2, blockSize, fontSize * 3, RED);
                 DrawText(TextFormat("Score:%d", score), (screenWidth - MeasureText(TextFormat("Score:%d", score), fontSize * 2.5)) / 2, blockSize * 2 + fontSize * 3, fontSize * 2.5, ORANGE);
                 DrawRectangleLines(boxOffset, boxOffset, screenWidth - boxOffset * 2, screenHeight - boxOffset * 2, WHITE);
-                const char *options[] = {
-                    "PLAY AGAIN",
-                    "MAIN MENU",
-                    "QUIT"};
-                int modes = sizeof(options) / sizeof(options[0]), spacing = ((screenHeight - 2 * boxOffset) - (modes)*fontSize) / (modes + 1);
                 for (int i = 0; i < modes; i++)
                 {
                     DrawText(TextFormat("%s", options[i]), (screenWidth - (MeasureText(TextFormat("%s", options[i]), fontSize))) / 2, boxOffset + spacing * (i + 1) + fontSize * (i), fontSize, WHITE);
                 }
 
-                // Draw Menu
+                // Select option
                 DrawLine(
                     (screenWidth - (MeasureText(TextFormat("%s", options[currMode]), fontSize))) / 2 - blockSize,
                     boxOffset + spacing * (currMode + 1) + fontSize * (currMode) + fontSize,
                     (screenWidth + (MeasureText(TextFormat("%s", options[currMode]), fontSize))) / 2 + blockSize,
                     boxOffset + spacing * (currMode + 1) + fontSize * (currMode) + fontSize,
                     WHITE);
+
+                if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_DOWN) || (IsKeyPressed(KEY_TAB) && !(IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT))))
+                {
+                    if (currMode < modes - 1)
+                        currMode++;
+                    else
+                        currMode = 0;
+                }
+                if (IsKeyPressed(KEY_UP) || (IsKeyPressed(KEY_TAB) && (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT))))
+                {
+                    if (currMode > 0)
+                        currMode--;
+                    else
+                        currMode = modes - 1;
+                }
+
+                if (IsKeyPressed(KEY_ENTER))
+                {
+                    switch (currMode)
+                    {
+                    case 0:
+                        score = 0;
+                        gameOver = false;
+                        snake.clear();
+                        break;
+                    case 1:
+                        score = 0;
+                        gameOver = false;
+                        start = false;
+                        snake.clear();
+                        break;
+                    case 2:
+                        CloseWindow();
+                        break;
+                    }
+                }
                 EndDrawing();
             }
         }
@@ -216,7 +255,7 @@ int main()
                 DrawText(TextFormat("%s", options[i]), (screenWidth - (MeasureText(TextFormat("%s", options[i]), fontSize))) / 2, boxOffset + spacing * (i + 1) + fontSize * (i), fontSize, WHITE);
             }
 
-            //Select menu
+            // Select menu
             DrawLine(
                 (screenWidth - (MeasureText(TextFormat("%s", options[currMode]), fontSize))) / 2 - blockSize,
                 boxOffset + spacing * (currMode + 1) + fontSize * (currMode) + fontSize,
@@ -226,14 +265,20 @@ int main()
             EndDrawing();
 
             // Change mode
-            if (IsKeyPressed(KEY_SPACE))
+            if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_DOWN) || (IsKeyPressed(KEY_TAB) && !(IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT))))
             {
                 if (currMode < modes - 1)
                     currMode++;
                 else
                     currMode = 0;
             }
-
+            if (IsKeyPressed(KEY_UP) || (IsKeyPressed(KEY_TAB) && (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT))))
+            {
+                if (currMode > 0)
+                    currMode--;
+                else
+                    currMode = modes - 1;
+            }
             if (IsKeyPressed(KEY_ENTER))
             {
                 switch (currMode)
