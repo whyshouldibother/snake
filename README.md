@@ -16,3 +16,7 @@ git clone https://github.com/whyshouldibother/snake.git
 2. Install Raylib
 - [Windows](https://github.com/raysan5/raylib/wiki/Working-on-Windows)
 - [Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux)
+
+## Usage
+
+- Linux `sh build.sh` 
