@@ -69,27 +69,28 @@ int main()
         if (!gameOver)
         {
             // Controls
-            if (IsKeyPressed(KEY_LEFT))
+
+            //Directions
+            if (IsKeyPressed(KEY_LEFT) && snake[0].directionX == 0)
             {
                 snake[0].directionX = -1;
                 snake[0].directionY = 0;
             };
-            if (IsKeyPressed(KEY_RIGHT))
+            if (IsKeyPressed(KEY_RIGHT) && snake[0].directionX == 0)
             {
                 snake[0].directionX = 1;
                 snake[0].directionY = 0;
             };
-            if (IsKeyPressed(KEY_UP))
+            if (IsKeyPressed(KEY_UP) && snake[0].directionY == 0)
             {
                 snake[0].directionX = 0;
                 snake[0].directionY = -1;
             };
-            if (IsKeyPressed(KEY_DOWN))
+            if (IsKeyPressed(KEY_DOWN) && snake[0].directionY == 0)
             {
                 snake[0].directionX = 0;
                 snake[0].directionY = 1;
             };
-
             // GameLogic
 
             // Check for Walls
@@ -128,7 +129,6 @@ int main()
             }
 
             ClearBackground(BLACK);
-            DrawText(TextFormat("Head\t%d%d", snake[0].x, snake[0].y), 800 - MeasureText(TextFormat("Head\t%d%d", snake[0].x, snake[0].y), 24), 24, 24, WHITE);
             DrawText(TextFormat("Score\t%d", score), 800 - MeasureText(TextFormat("Score\t%d", score), 24), 0, 24, WHITE);
             DrawRectangle(food.x, food.y, 10, 10, RED);
             DrawRectangle(snake[0].x, snake[0].y, 10, 10, DARKGREEN);
