@@ -8,11 +8,11 @@ In this classic arcade game, you play as a hungry snake navigating a rectangular
 -[Installation](#installation)
 
 ## Installation
-1. Clone the repository:
+### Clone the repository:
 ```
 git clone https://github.com/whyshouldibother/snake.git
 ```
 
-2. Install Raylib
+### Install Raylib
 -[Windows](https://github.com/raysan5/raylib/wiki/Working-on-Windows)
 -[Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux)
