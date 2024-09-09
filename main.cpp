@@ -1,4 +1,4 @@
-#include "raylib.hpp"
+#include "raylib.h"
 #include <cstdlib>
 #include <random>
 #include <iostream>
