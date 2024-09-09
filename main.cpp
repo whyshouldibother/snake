@@ -62,7 +62,7 @@ int randGen(int max, int blockSize)
 int main()
 {
 
-    int screenWidth = 800, screenHeight = 600, fps = 10, blockSize = 10, fontSize = 24;
+    int screenWidth = 800, screenHeight = 600, fps = 10, blockSize = 10, fontSize = 24, currMode = 0;
     InitWindow(screenWidth, screenHeight, "Snake");
     SetTargetFPS(fps);
     entity food(randGen(screenWidth, blockSize), randGen(screenHeight, blockSize));
@@ -127,6 +127,7 @@ int main()
                 {
                     if (snake[0] == snake[i])
                     {
+                        cout<<snake.size();
                         gameOver = true;
                         break;
                     }
@@ -152,25 +153,75 @@ int main()
                 EndDrawing();
             }
         }
-        BeginDrawing();
-        int boxOffset = blockSize * 15;
-        DrawRectangleLines(boxOffset, boxOffset, screenWidth - boxOffset * 2, screenHeight - boxOffset * 2, WHITE);
+        else
+        {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            int boxOffset = blockSize * 15;
 
-        string optins[] = {
-            "EASY",
-            "MEDIUM",
-            "HARD",
-            "CUSTOM",
-            "CONFIG",
-            "QUIT"
-        };
-        DrawText("EASY", screenWidth / 2 - MeasureText(TextFormat("EASY"), fontSize) / 2, boxOffset + blockSize + fontSize, fontSize, WHITE);
-        DrawText("MEDIUM", screenWidth / 2 - MeasureText(TextFormat("MEDIUM"), fontSize) / 2, boxOffset + blockSize * 2 + fontSize, fontSize, WHITE);
-        DrawText("HARD", screenWidth / 2 - MeasureText(TextFormat("HARD"), fontSize) / 2, boxOffset + blockSize * 3 + fontSize * 2, fontSize, WHITE);
-        DrawText("CUSTOM", screenWidth / 2 - MeasureText(TextFormat("CUSTOM"), fontSize) / 2, boxOffset + blockSize * 4 + fontSize * 3, fontSize, WHITE);
-        DrawText("CONFIG", screenWidth / 2 - MeasureText(TextFormat("CONFIG"), fontSize) / 2, boxOffset + blockSize * 5 + fontSize * 4, fontSize, WHITE);
-        DrawText("QUIT", screenWidth / 2 - MeasureText(TextFormat("QUIT"), fontSize) / 2, boxOffset + blockSize * 6 + fontSize * 6, fontSize, WHITE);
-        EndDrawing();
+            DrawText("Use SPACE for next", (screenWidth - (MeasureText(TextFormat("Use SPACE for next"), fontSize * 1.5))) / 2, blockSize, fontSize * 1.5, WHITE);
+            DrawText("Use ENTER to select", (screenWidth - (MeasureText(TextFormat("Use ENTER to select"), fontSize * 1.5))) / 2, blockSize + fontSize * 1.5, fontSize * 1.5, WHITE);
+            DrawRectangleLines(boxOffset, boxOffset, screenWidth - boxOffset * 2, screenHeight - boxOffset * 2, WHITE);
+
+            const char *options[] = {
+                "Tutorial",
+                "EASY",
+                "MEDIUM",
+                "HARD",
+                "CUSTOM",
+                "CONFIG",
+                "QUIT"};
+            int modes = sizeof(options) / sizeof(options[0]), spacing = ((screenHeight - 2 * boxOffset) - (modes)*fontSize) / (modes + 1);
+            for (int i = 0; i < modes; i++)
+            {
+                DrawText(TextFormat("%s", options[i]), (screenWidth - (MeasureText(TextFormat("%s", options[i]), fontSize))) / 2, boxOffset + spacing * (i + 1) + fontSize * (i), fontSize, WHITE);
+            }
+
+            // Draw Menu
+            DrawLine(
+                (screenWidth - (MeasureText(TextFormat("%s", options[currMode]), fontSize))) / 2 - blockSize,
+                boxOffset + spacing * (currMode + 1) + fontSize * (currMode) + fontSize,
+                (screenWidth + (MeasureText(TextFormat("%s", options[currMode]), fontSize))) / 2 + blockSize,
+                boxOffset + spacing * (currMode + 1) + fontSize * (currMode) + fontSize,
+                WHITE);
+            EndDrawing();
+
+            // Change mode
+            if (IsKeyPressed(KEY_SPACE))
+            {
+                if (currMode < modes - 1)
+                    currMode++;
+                else
+                    currMode = 0;
+            }
+
+            if (IsKeyPressed(KEY_ENTER))
+            {
+                switch (currMode)
+                {
+                case 0:
+                    break;
+                case 1:
+                    start = true;
+                    break;
+                case 2:
+                    start = true;
+                    break;
+                case 3:
+                    start = true;
+                    break;
+                case 4:
+                    start = true;
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
     }
     return 0;
 }
