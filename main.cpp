@@ -79,6 +79,8 @@ int main()
 
     int screenWidth = 800, screenHeight = 600, fps = 10, blockSize = 10, boxOffset = blockSize * 15, fontSize = 24, currMode = 0, score = 0, difficulty;
     InitWindow(screenWidth, screenHeight, "Snake");
+    InitAudioDevice();
+    Sound gameOverSound = LoadSound("assets/gameover.mp3"), biteSound = LoadSound("assets/bite.mp3");
     SetTargetFPS(fps);
     entity food(randGen(screenWidth, blockSize), randGen(screenHeight, blockSize));
     vector<entity> snake;
@@ -119,12 +121,16 @@ int main()
 
                 // Check for Walls
                 if (snake[0].check() == false && difficulty > 0)
+                {
+                    PlaySound(gameOverSound);
                     gameOver = true;
+                }
 
                 // Check Growth
                 if (snake[0].grow(&food, screenWidth, screenHeight, blockSize))
                 {
                     // Grow snake
+                    PlaySound(biteSound);
                     snake.push_back(entity(snake[snake.size() - 1].x, snake[snake.size() - 1].y));
                     score++;
                 };
@@ -143,7 +149,7 @@ int main()
                 {
                     if (snake[0] == snake[i])
                     {
-                        cout << snake.size();
+                        PlaySound(gameOverSound);
                         gameOver = true;
                         break;
                     }
@@ -163,7 +169,6 @@ int main()
             }
             else
             {
-
                 // Gameover
                 const char *options[] = {
                     "PLAY AGAIN",
@@ -296,6 +301,7 @@ int main()
                 case 3:
                     start = true;
                     difficulty = 2;
+                    SetTargetFPS(20);
                     break;
                 case 4:
                     start = true;
@@ -311,5 +317,9 @@ int main()
             }
         }
     }
+    UnloadSound(gameOverSound);
+    UnloadSound(biteSound);
+    CloseAudioDevice();
+    CloseWindow();
     return 0;
 }
