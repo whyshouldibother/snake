@@ -10,8 +10,9 @@ class entity
 public:
     int x;
     int y;
-    int directionX;
-    int directionY;
+    int directionX = 0;
+    int directionY = 0;
+    entity() {};
     entity(int x, int y)
     {
         this->x = x;
@@ -40,9 +41,15 @@ public:
         {
             food->x = rand() % 80 * 10;
             food->y = rand() % 60 * 10;
-        return true;
+            return true;
         }
-        else return false;
+        else
+            return false;
+    }
+
+    bool operator==(entity compare)
+    {
+        return (x == compare.x && y == compare.y);
     }
 };
 
@@ -55,48 +62,86 @@ int main()
     vector<entity> snake;
     snake.push_back(entity(400, 300));
     int score = 0;
+    bool gameOver = false;
     while (!WindowShouldClose())
-    {   
-        BeginDrawing();
-        ClearBackground(BLACK);
-        DrawText(TextFormat("Score\t%d",score), 800 - MeasureText(TextFormat("Score\t%d",score),24), 0, 24, WHITE);
-        DrawRectangle(food.x, food.y, 10, 10, RED);
-        DrawRectangle(snake[0].x, snake[0].y, 10, 10, DARKGREEN);
-        if (IsKeyPressed(KEY_LEFT))
+    {
+
+        if (!gameOver)
         {
-            snake[0].directionX = -1;
-            snake[0].directionY = 0;
-        };
-        if (IsKeyPressed(KEY_RIGHT))
-        {
-            snake[0].directionX = 1;
-            snake[0].directionY = 0;
-        };
-        if (IsKeyPressed(KEY_UP))
-        {
-            snake[0].directionX = 0;
-            snake[0].directionY = -1;
-        };
-        if (IsKeyPressed(KEY_DOWN))
-        {
-            snake[0].directionX = 0;
-            snake[0].directionY = 1;
-        };
-        snake[0].update();
-        snake[0].check();
-        if (snake[0].grow(&food))
-        {
-            snake.push_back(snake[score]);
-            score ++;
-            cout<<score;
-        };
-        for(int i=snake.size()-1; i>0;i--){
-                snake[i]=snake[i-1];
+            // Controls
+            if (IsKeyPressed(KEY_LEFT))
+            {
+                snake[0].directionX = -1;
+                snake[0].directionY = 0;
+            };
+            if (IsKeyPressed(KEY_RIGHT))
+            {
+                snake[0].directionX = 1;
+                snake[0].directionY = 0;
+            };
+            if (IsKeyPressed(KEY_UP))
+            {
+                snake[0].directionX = 0;
+                snake[0].directionY = -1;
+            };
+            if (IsKeyPressed(KEY_DOWN))
+            {
+                snake[0].directionX = 0;
+                snake[0].directionY = 1;
+            };
+
+            // GameLogic
+
+            // Check for Walls
+            snake[0].check();
+
+            // Check Growth
+            if (snake[0].grow(&food))
+            {
+                // Grow snake
+                snake.push_back(entity(snake[snake.size() - 1].x, snake[snake.size() - 1].y));
+                score++;
+            };
+
+            // Update snake body
+            for (int i = snake.size() - 1; i > 0; i--)
+            {
+                snake[i] = snake[i - 1];
             }
-        for(int i=1; i<snake.size();i++){
-            DrawRectangle(snake[i].x+1, snake[i].y+1, 8, 8, GREEN);
+
+            // Move Head
+            snake[0].update();
+
+            // Check Game Over
+            for (int i = 1; i < snake.size(); i++)
+            {
+                if (snake[0] == snake[i])
+                {
+                    gameOver = true;
+                    break;
+                }
+            }
+            BeginDrawing();
+            for (int i = 1; i < snake.size(); i++)
+            {
+                DrawRectangle(snake[i].x, snake[i].y, 10, 10, GREEN);
+            }
+
+            ClearBackground(BLACK);
+            DrawText(TextFormat("Head\t%d%d", snake[0].x, snake[0].y), 800 - MeasureText(TextFormat("Head\t%d%d", snake[0].x, snake[0].y), 24), 24, 24, WHITE);
+            DrawText(TextFormat("Score\t%d", score), 800 - MeasureText(TextFormat("Score\t%d", score), 24), 0, 24, WHITE);
+            DrawRectangle(food.x, food.y, 10, 10, RED);
+            DrawRectangle(snake[0].x, snake[0].y, 10, 10, DARKGREEN);
+
+            EndDrawing();
         }
-        EndDrawing();
+        else
+        {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            DrawText(TextFormat("GameOver"), 400 - MeasureText(TextFormat("GameOver"), 24 / 2), (300 - 24), 24, WHITE);
+            EndDrawing();
+        }
     }
     return 0;
 }
