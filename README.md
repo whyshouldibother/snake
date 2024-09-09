@@ -19,4 +19,5 @@ git clone https://github.com/whyshouldibother/snake.git
 
 ## Usage
 
-- Linux `sh build.sh` 
+- Linux 
+```sh build.sh```
