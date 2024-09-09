@@ -4,22 +4,28 @@ In this classic arcade game, you play as a hungry snake navigating a rectangular
 
 
 ## Table of Contents
-
 - [Installation](#installation)
+- [Usage](#usage)
 
 ## Installation
+
 1. Clone the repository:
+
 ```
 git clone https://github.com/whyshouldibother/snake.git
 ```
 
 2. Install Raylib
+
 - [Windows](https://github.com/raysan5/raylib/wiki/Working-on-Windows)
 - [Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux)
 
 ## Usage
 
-- Linux 
+To play snake generate the executable
+
+- Linux
+
 ```
 sh build.sh
 ```
