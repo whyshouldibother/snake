@@ -1,4 +1,4 @@
-#include "raylib.h"
+#include "raylib.hpp"
 #include <cstdlib>
 #include <random>
 #include <iostream>
@@ -27,26 +27,26 @@ public:
         this->x = x;
         this->y = y;
     }
-    bool check()
+    bool check(int screenWidth, int screenHeight)
     {
-        if (x > 800)
+        if (x >= screenWidth)
         {
             x = 0;
             return false;
         }
         if (x < 0)
         {
-            x = 800;
+            x = screenWidth;
             return false;
         }
-        if (y > 600)
+        if (y >= screenHeight)
         {
             y = 0;
             return false;
         }
         if (y < 0)
         {
-            y = 600;
+            y = screenHeight;
             return false;
         }
         return true;
@@ -120,7 +120,7 @@ int main()
                 // GameLogic
 
                 // Check for Walls
-                if (snake[0].check() == false && difficulty > 0)
+                if (snake[0].check(screenWidth, screenHeight) == false && difficulty > 0)
                 {
                     PlaySound(gameOverSound);
                     gameOver = true;
@@ -199,21 +199,15 @@ int main()
                     WHITE);
 
                 if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_DOWN) || (IsKeyPressed(KEY_TAB) && !(IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT))))
-                {
-                    if (currMode < modes - 1)
-                        currMode++;
-                    else
-                        currMode = 0;
-                }
+               currMode++;
                 if (IsKeyPressed(KEY_UP) || (IsKeyPressed(KEY_TAB) && (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT))))
-                {
-                    if (currMode > 0)
-                        currMode--;
-                    else
-                        currMode = modes - 1;
-                }
-
-                if (IsKeyPressed(KEY_ENTER))
+                currMode--;
+                currMode += GetMouseWheelMove();
+                if (currMode < 0)
+                    currMode = modes - 1;
+                if (currMode >= modes)
+                    currMode = 0;
+                if (IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
                 {
                     switch (currMode)
                     {
@@ -271,20 +265,15 @@ int main()
 
             // Change mode
             if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_DOWN) || (IsKeyPressed(KEY_TAB) && !(IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT))))
-            {
-                if (currMode < modes - 1)
-                    currMode++;
-                else
-                    currMode = 0;
-            }
+          currMode++;
             if (IsKeyPressed(KEY_UP) || (IsKeyPressed(KEY_TAB) && (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT))))
-            {
-                if (currMode > 0)
-                    currMode--;
-                else
-                    currMode = modes - 1;
-            }
-            if (IsKeyPressed(KEY_ENTER))
+            currMode--;
+            currMode += GetMouseWheelMove();
+            if (currMode < 0)
+                currMode = modes - 1;
+            if (currMode >= modes)
+                currMode = 0;
+            if (IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 switch (currMode)
                 {
