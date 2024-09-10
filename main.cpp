@@ -122,7 +122,7 @@ int main()
     Color backgroundColor = BLACK, fontColor = WHITE, snakeHeadColor = DARKGREEN, snakeBodyColor = GREEN, foodColor = RED, gameOverColor = RED, scoreColor = ORANGE;
 
     // Initiliaze window and set default FPS
-    InitWindow(screenWidth, screenHeight, "Snake");
+    InitWindow(screenWidth, screenHeight, TextFormat("Snake\t%dx%d",screenWidth,screenHeight));
     SetTargetFPS(fps);
 
     // Initialize Audio Devices
@@ -633,6 +633,10 @@ int main()
                 // Toggle Block size
                 case 1:
                     blockSize = blockSize == 10 ? 20 : 10;
+                    
+                    //Regenerate food to factor in block size change
+                    food.x = randGen(screenWidth, blockSize);
+                    food.y = randGen(screenHeight, blockSize);
                     break;
 
                 // Change Screen Width
@@ -640,10 +644,13 @@ int main()
                     screenWidth += 200;
                     if (screenWidth > 1200)
                         screenWidth = 600;
+                    
+                    //Regenerate food to factor in screenwidth change
+                    food.x = randGen(screenWidth, blockSize);
 
                     // Reintialize window
                     CloseWindow();
-                    InitWindow(screenWidth, screenHeight, "Snake");
+                    InitWindow(screenWidth, screenHeight, TextFormat("Snake\t%dx%d",screenWidth,screenHeight));
                     break;
 
                 // Chnage Screen Height
@@ -652,9 +659,12 @@ int main()
                     if (screenHeight > 900)
                         screenHeight = 500;
 
-                    // Chnage Screen Height
+                    //Regenerate food to factor in screenheight change
+                    food.y = randGen(screenHeight, blockSize);
+                    
+                    // Reintialize window
                     CloseWindow();
-                    InitWindow(screenWidth, screenHeight, "Snake");
+                    InitWindow(screenWidth, screenHeight, TextFormat("Snake\t%dx%d",screenWidth,screenHeight));
                     break;
 
                 // Change Font Size
@@ -789,4 +799,4 @@ int main()
     CloseAudioDevice();
     CloseWindow();
     return 0;
-}
+}   

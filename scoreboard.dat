@@ -26,3 +26,6 @@ Screen	800X600	FPS	10	Walls	false	SelfHarm	true	Score	11
 Screen	800X600	FPS	10	Walls	false	SelfHarm	true	Score	9
 Screen	800X600	FPS	10	Walls	true	SelfHarm	true	Score	0
 Screen	800X600	FPS	10	Walls	true	SelfHarm	true	Score	4
+Screen	1200X900	FPS	10	Walls	false	SelfHarm	true	Score	6
+Screen	1200X900	FPS	10	Walls	true	SelfHarm	true	Score	0
+Screen	800X600	FPS	10	Walls	true	SelfHarm	true	Score	8
