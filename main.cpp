@@ -77,7 +77,7 @@ public:
 int main()
 {
 
-    int screenWidth = 800, screenHeight = 600, fps = 10, blockSize = 10, boxOffset = blockSize * 15, fontSize = 24, currMode = 0, score = 0, colorSchemeIndex = 0, scoreBoardIndex = 0;
+    int screenWidth = 800, screenHeight = 600, fps = 10, blockSize = 10, boxOffset = blockSize * 15, fontSize = 24, currMode = 0, score = 0, colorSchemeIndex = 0, scoreBoardIndex = 0, menuMode=6;
     const char *colorScheme[] = {
         "DARK1",
         "DARK2",
@@ -93,11 +93,42 @@ int main()
     entity food(randGen(screenWidth, blockSize), randGen(screenHeight, blockSize));
     vector<entity> snake;
     snake.push_back(entity(randGen(screenWidth, blockSize), randGen(screenHeight, blockSize)));
-    bool gameOver = false, start = false, custom = false, walls = false, selfHarm = true, configure = false, recordScore = false, showScore = false;
+    bool gameOver = false,  walls = false, selfHarm = true, recordScore = false;
     Color backgroundColor = BLACK, fontColor = WHITE, snakeHeadColor = DARKGREEN, snakeBodyColor = GREEN, foodColor = RED, gameOverColor = RED, scoreColor = ORANGE;
     while (!WindowShouldClose())
     {
-        if (start)
+        if (menuMode==0)
+        {
+            static vector<string> lines = vector<string> ();
+            string line;
+            if (lines.empty())
+            {
+                ifstream scoreBoard("scoreboard.dat");
+                while(getline(scoreBoard,line )){
+                    lines.push_back(line);
+                }
+                scoreBoard.close();
+            }
+            int spacing = ((screenHeight - 2 * boxOffset) - 5*fontSize) / 6;
+            BeginDrawing();
+            ClearBackground(backgroundColor);
+            DrawText("Use SPACE to scroll", (screenWidth - (MeasureText(TextFormat("Use SPACE to scroll"), fontSize * 1.5))) / 2, blockSize, fontSize * 1.5, fontColor);
+            DrawText("Use ENTER to return", (screenWidth - (MeasureText(TextFormat("Use ENTER to return"), fontSize * 1.5))) / 2, blockSize + fontSize * 1.5, fontSize * 1.5, fontColor);
+            for (int i = scoreBoardIndex; i < scoreBoardIndex+7; i++)
+            {
+                DrawText(TextFormat("%s", lines[i%lines.size()].c_str()), (screenWidth - (MeasureText(TextFormat("%s", lines[i%lines.size()].c_str()), fontSize))) / 2, boxOffset + spacing * (i -scoreBoardIndex + 1) + fontSize * (i - scoreBoardIndex), fontSize, fontColor);
+            }
+            EndDrawing();
+            if (IsKeyPressed(KEY_ENTER))
+            {
+                lines.clear();
+                menuMode=6;
+            }
+            if(IsKeyPressed(KEY_SPACE) || IsKeyDown(KEY_SPACE)){
+                scoreBoardIndex++;
+            }
+        }
+        else if (menuMode>=1 && menuMode<=3)
         {
 
             if (!gameOver)
@@ -243,7 +274,7 @@ int main()
                     case 1:
                         score = 0;
                         gameOver = false;
-                        start = false;
+                        menuMode=6;
                         snake.clear();
                         break;
                     case 2:
@@ -254,7 +285,7 @@ int main()
                 EndDrawing();
             }
         }
-        else if (custom)
+        else if (menuMode==4)
         {
             BeginDrawing();
             ClearBackground(backgroundColor);
@@ -319,10 +350,10 @@ int main()
                     break;
                 case 3:
                     SetTargetFPS(fps);
-                    custom = false;
-                    start = true;
+                    menuMode=2;
+                    break;
                 case 4:
-                    custom = false;
+                    menuMode=6;
                     break;
                 case 5:
                     CloseWindow();
@@ -332,7 +363,7 @@ int main()
                 }
             }
         }
-        else if (configure)
+        else if (menuMode==5)
         {
             BeginDrawing();
             ClearBackground(backgroundColor);
@@ -475,7 +506,7 @@ int main()
                         fontSize = 12;
                     break;
                 case 5:
-                    configure = false;
+                    menuMode=6;
                     break;
                 case 6:
                     CloseWindow();
@@ -485,38 +516,7 @@ int main()
                 }
             }
         }
-        else if (showScore)
-        {
-            static vector<string> lines = vector<string> ();
-            string line;
-            if (lines.empty())
-            {
-                ifstream scoreBoard("scoreboard.dat");
-                while(getline(scoreBoard,line )){
-                    lines.push_back(line);
-                }
-                scoreBoard.close();
-            }
-            int spacing = ((screenHeight - 2 * boxOffset) - 5*fontSize) / 6;
-            BeginDrawing();
-            ClearBackground(backgroundColor);
-            DrawText("Use SPACE to scroll", (screenWidth - (MeasureText(TextFormat("Use SPACE to scroll"), fontSize * 1.5))) / 2, blockSize, fontSize * 1.5, fontColor);
-            DrawText("Use ENTER to return", (screenWidth - (MeasureText(TextFormat("Use ENTER to return"), fontSize * 1.5))) / 2, blockSize + fontSize * 1.5, fontSize * 1.5, fontColor);
-            for (int i = scoreBoardIndex; i < scoreBoardIndex+7; i++)
-            {
-                DrawText(TextFormat("%s", lines[i%lines.size()].c_str()), (screenWidth - (MeasureText(TextFormat("%s", lines[i%lines.size()].c_str()), fontSize))) / 2, boxOffset + spacing * (i -scoreBoardIndex + 1) + fontSize * (i - scoreBoardIndex), fontSize, fontColor);
-            }
-            EndDrawing();
-            if (IsKeyPressed(KEY_ENTER))
-            {
-                lines.clear();
-                showScore = false;
-            }
-            if(IsKeyPressed(KEY_SPACE) || IsKeyDown(KEY_SPACE)){
-                scoreBoardIndex++;
-            }
-        }
-        else
+        else if(menuMode==6)
         {
             BeginDrawing();
             ClearBackground(backgroundColor);
@@ -564,29 +564,29 @@ int main()
                 switch (currMode)
                 {
                 case 0:
-                    showScore = true;
+                    menuMode=0;
                     break;
                 case 1:
-                    start = true;
                     walls = false;
                     selfHarm = true;
+                    menuMode =1;
                     break;
                 case 2:
-                    start = true;
                     walls = true;
                     selfHarm = true;
+                     menuMode =2;
                     break;
                 case 3:
-                    start = true;
                     walls = true;
                     selfHarm = true;
                     SetTargetFPS(20);
+                    menuMode =3;
                     break;
                 case 4:
-                    custom = true;
+                    menuMode=4;
                     break;
                 case 5:
-                    configure = true;
+                    menuMode=5;
                     break;
                 case 6:
                     CloseWindow();
