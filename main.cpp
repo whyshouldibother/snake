@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
+#include <fstream>
 using namespace std;
 
 int randGen(int max, int blockSize)
@@ -76,7 +77,7 @@ public:
 int main()
 {
 
-    int screenWidth = 800, screenHeight = 600, fps = 10, blockSize = 10, boxOffset = blockSize * 15, fontSize = 24, currMode = 0, score = 0, colorSchemeIndex = 0;
+    int screenWidth = 800, screenHeight = 600, fps = 10, blockSize = 10, boxOffset = blockSize * 15, fontSize = 24, currMode = 0, score = 0, colorSchemeIndex = 0, scoreBoardIndex = 0;
     const char *colorScheme[] = {
         "DARK1",
         "DARK2",
@@ -92,7 +93,7 @@ int main()
     entity food(randGen(screenWidth, blockSize), randGen(screenHeight, blockSize));
     vector<entity> snake;
     snake.push_back(entity(randGen(screenWidth, blockSize), randGen(screenHeight, blockSize)));
-    bool gameOver = false, start = false, custom = false, walls = false, selfHarm = true, configure = false;
+    bool gameOver = false, start = false, custom = false, walls = false, selfHarm = true, configure = false, recordScore = false, showScore = false;
     Color backgroundColor = BLACK, fontColor = WHITE, snakeHeadColor = DARKGREEN, snakeBodyColor = GREEN, foodColor = RED, gameOverColor = RED, scoreColor = ORANGE;
     while (!WindowShouldClose())
     {
@@ -101,6 +102,7 @@ int main()
 
             if (!gameOver)
             {
+
                 currMode = 0;
                 // Controls
 
@@ -132,6 +134,7 @@ int main()
                 {
                     PlaySound(gameOverSound);
                     gameOver = true;
+                    recordScore = false;
                 }
 
                 // Check Growth
@@ -160,6 +163,7 @@ int main()
                         {
                             PlaySound(gameOverSound);
                             gameOver = true;
+                            recordScore = false;
                             break;
                         }
                     }
@@ -178,6 +182,17 @@ int main()
             }
             else
             {
+
+                // Record Score
+                if (!recordScore)
+                {
+
+                    fstream scoreBoard;
+                    scoreBoard.open("scoreboard.dat", ios::app);
+                    scoreBoard << "Screen\t" << screenWidth << "X" << screenHeight << "\tFPS\t" << fps << boolalpha << "\tWalls\t" << walls << "\tSelfHarm\t" << selfHarm << "\tScore\t" << score << endl;
+                    scoreBoard.close();
+                    recordScore = true;
+                }
                 // Gameover
                 const char *options[] = {
                     "PLAY AGAIN",
@@ -442,19 +457,22 @@ int main()
                     break;
                 case 2:
                     screenWidth += 200;
-                    if(screenWidth>1200) screenWidth = 600;
+                    if (screenWidth > 1200)
+                        screenWidth = 600;
                     CloseWindow();
                     InitWindow(screenWidth, screenHeight, "Snake");
                     break;
                 case 3:
                     screenHeight += 100;
-                    if(screenHeight>900) screenHeight = 500;
+                    if (screenHeight > 900)
+                        screenHeight = 500;
                     CloseWindow();
                     InitWindow(screenWidth, screenHeight, "Snake");
                     break;
                 case 4:
                     fontSize += 12;
-                    if(fontSize>36) fontSize=12;
+                    if (fontSize > 36)
+                        fontSize = 12;
                     break;
                 case 5:
                     configure = false;
@@ -465,6 +483,37 @@ int main()
                 default:
                     break;
                 }
+            }
+        }
+        else if (showScore)
+        {
+            static vector<string> lines = vector<string> ();
+            string line;
+            if (lines.empty())
+            {
+                ifstream scoreBoard("scoreboard.dat");
+                while(getline(scoreBoard,line )){
+                    lines.push_back(line);
+                }
+                scoreBoard.close();
+            }
+            int spacing = ((screenHeight - 2 * boxOffset) - 5*fontSize) / 6;
+            BeginDrawing();
+            ClearBackground(backgroundColor);
+            DrawText("Use SPACE to scroll", (screenWidth - (MeasureText(TextFormat("Use SPACE to scroll"), fontSize * 1.5))) / 2, blockSize, fontSize * 1.5, fontColor);
+            DrawText("Use ENTER to return", (screenWidth - (MeasureText(TextFormat("Use ENTER to return"), fontSize * 1.5))) / 2, blockSize + fontSize * 1.5, fontSize * 1.5, fontColor);
+            for (int i = scoreBoardIndex; i < scoreBoardIndex+7; i++)
+            {
+                DrawText(TextFormat("%s", lines[i%lines.size()].c_str()), (screenWidth - (MeasureText(TextFormat("%s", lines[i%lines.size()].c_str()), fontSize))) / 2, boxOffset + spacing * (i -scoreBoardIndex + 1) + fontSize * (i - scoreBoardIndex), fontSize, fontColor);
+            }
+            EndDrawing();
+            if (IsKeyPressed(KEY_ENTER))
+            {
+                lines.clear();
+                showScore = false;
+            }
+            if(IsKeyPressed(KEY_SPACE) || IsKeyDown(KEY_SPACE)){
+                scoreBoardIndex++;
             }
         }
         else
@@ -478,7 +527,7 @@ int main()
 
             // Draw Menu
             const char *options[] = {
-                "Tutorial",
+                "SCOREBOARD",
                 "EASY",
                 "MEDIUM",
                 "HARD",
@@ -515,6 +564,7 @@ int main()
                 switch (currMode)
                 {
                 case 0:
+                    showScore = true;
                     break;
                 case 1:
                     start = true;
