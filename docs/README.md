@@ -13,6 +13,6 @@ Make sure to add the path/bin to path
 ### For using other IDE
 - Download the latest release of [Raylib library](https://github.com/raysan5/raylib/releases/tag/5.0) corresponding to your IDE.
 - Extract Raylib and copy them to your project folder
-- Modify your build command to be g++ main.cpp -Iinclude -Llib -lraylib -lwinmm -lopengl32 -lgdi32
+- Modify your build command to be `g++ main.cpp -Iinclude -Llib -lraylib -lwinmm -lopengl32 -lgdi32`
 
 If the following methods doesnt work inquire the [official site](https://github.com/raysan5/raylib/wiki/Working-on-Windows)
