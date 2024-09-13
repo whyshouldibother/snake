@@ -18,13 +18,16 @@ git clone https://github.com/whyshouldibother/snake.git
 
 To play snake generate the executable
 
-- Linux
+### Linux
 
+Run the bash script
 ```
 sh build.sh
 ```
 
-- Windows
+### Windows
+
+Run the batch file
 ```
 start build.bat
 ```
