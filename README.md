@@ -1,6 +1,4 @@
 # SNAKE
-
-## About
 This is a recreation of the classic Snake arcade game, built using the **Raylib** library in C++
 ## Installation
 1. Clone the repository:
