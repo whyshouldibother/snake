@@ -23,3 +23,8 @@ To play snake generate the executable
 ```
 sh build.sh
 ```
+
+- Windows
+```
+start build.bat
+```

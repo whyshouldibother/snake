@@ -11,7 +11,7 @@ Make sure to add the path/bin to path
 - Extract Raylib and copy the files under include and lib to respective folders under MinGw_path/bin
 
 ### For using other IDE
-- Download the latest release of [Raylib library](https://github.com/raysan5/raylib/releases/tag/5.0) corresponding to your IDE.
+- Download the latest release of [Raylib library](https://github.com/raysan5/raylib/releases/tag/5.0) corresponding to your IDE. If you don't find any thing correspond to your IDE download the one for [MinGw](https://github.com/raysan5/raylib/releases/download/5.0/raylib-5.0_win64_mingw-w64.zip)
 - Extract Raylib and copy them to your project folder
 - Modify your build command to be `g++ main.cpp -Iinclude -Llib -lraylib -lwinmm -lopengl32 -lgdi32`
 
