@@ -109,6 +109,8 @@ int main()
     // Game Flags
     bool gameOver = false, walls = false, selfHarm = true, recordScore = false;
 
+    bool devAdv = false;//for dev
+
     // Available Color Schemes
     const char *colorScheme[] = {
         "DARK1",
@@ -224,7 +226,37 @@ int main()
                     snake[0].directionX = 0;
                     snake[0].directionY = 1;
                 };
+                if(IsKeyPressed(KEY_K)){
+                    devAdv = !devAdv;
+                }
                 // GameLogic
+                
+                //Hamilton circuit
+                if(devAdv == true){
+
+                if(snake[0].x>=screenWidth-blockSize && snake[0].directionX==1 && snake[0].directionY==0){
+                snake[0].directionX = 0;
+                snake[0].directionY = 1;
+                }
+                else if(snake[0].x>=screenWidth-blockSize && snake[0].directionX==0 && snake[0].directionY==1){
+                snake[0].directionX = -1;
+                snake[0].directionY = 0;
+                }else if(snake[0].x<=blockSize && snake[0].directionX==-1 && snake[0].directionY==0 && snake[0].y<screenHeight - blockSize){
+                snake[0].directionX = 0;
+                snake[0].directionY = 1;
+                }else if(snake[0].x<=blockSize && snake[0].directionX==0 && snake[0].directionY==1){
+                snake[0].directionX = 1;
+                snake[0].directionY = 0;
+                }else if(snake[0].x<blockSize && snake[0].directionX==-1 && snake[0].directionY==0 && snake[0].y>=screenHeight-blockSize){
+                snake[0].directionX = 0;
+                snake[0].directionY = -1;
+                }
+                else if(snake[0].x<blockSize && snake[0].directionX==0 && snake[0].directionY==-1 && snake[0].y<blockSize){
+                snake[0].directionX = 1;
+                snake[0].directionY = 0;
+                }
+            }
+                
 
                 // Check for Walls
                 if (!snake[0].check(screenWidth, screenHeight) && walls)
