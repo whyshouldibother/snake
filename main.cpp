@@ -74,14 +74,15 @@ public:
     }
 
     // Grow entity if food is eaten
-    bool grow(entity *food, int maxX, int maxY, int blockSize)
+    bool grow(entity *food, int maxX, int maxY, int blockSize, vector<entity> snake)
     {
         if (x == food->x && y == food->y)
         {
-
+            foodGen:
             // Regenerate food
             food->x = randGen(maxX, blockSize);
             food->y = randGen(maxY, blockSize);
+            for(int i=0; i<snake.size(); i++) if(snake[i].x==food->x && snake[i].y==food->y) goto foodGen;
             return true;
         }
         else
@@ -277,7 +278,7 @@ int main()
                 }
 
                 // Check Growth
-                if (snake[0].grow(&food, screenWidth, screenHeight, blockSize))
+                if (snake[0].grow(&food, screenWidth, screenHeight, blockSize, snake))
                 {
                     // Grow snake
                     PlaySound(biteSound);
