@@ -7,25 +7,24 @@
 #include <fstream>
 using namespace std;
 
-//Randomizer
+// Randomizer
 int randGen(int max, int blockSize)
 {
 
-    //Random number engine
+    // Random number engine
     random_device rd;
     mt19937 mt(rd());
 
-    //Get a number between 5 to maxium of the blocksize of 5
+    // Get a number between 5 to maxium of the blocksize of 5
     uniform_int_distribution<int> dist(5, max / blockSize - 5);
-    
-    //Return coordinates
+
+    // Return coordinates
     return dist(mt) * blockSize;
 }
 
 class entity
 {
 public:
-
     //(x,y) = coordinates
     int x;
     int y;
@@ -41,7 +40,7 @@ public:
         this->y = y;
     }
 
-    //Check for walls
+    // Check for walls
     bool check(int screenWidth, int screenHeight)
     {
         if (x >= screenWidth)
@@ -67,20 +66,20 @@ public:
         return true;
     }
 
-    //Update entity in refrence to direction
+    // Update entity in refrence to direction
     void update(int blocksize)
     {
         x += blocksize * directionX;
         y += blocksize * directionY;
     }
 
-    //Grow entity if food is eaten
+    // Grow entity if food is eaten
     bool grow(entity *food, int maxX, int maxY, int blockSize)
     {
         if (x == food->x && y == food->y)
         {
 
-            //Regenerate food
+            // Regenerate food
             food->x = randGen(maxX, blockSize);
             food->y = randGen(maxY, blockSize);
             return true;
@@ -89,14 +88,14 @@ public:
             return false;
     }
 
-    //Compare two parts of snake for collision
+    // Compare two parts of snake for collision
     bool operator==(entity compare)
     {
         return (x == compare.x && y == compare.y);
     }
 };
 
-//Driver code
+// Driver code
 int main()
 {
 
@@ -109,7 +108,7 @@ int main()
     // Game Flags
     bool gameOver = false, walls = false, selfHarm = true, recordScore = false;
 
-    bool devAdv = false;//for dev
+    bool devAdv = false; // for dev
 
     // Available Color Schemes
     const char *colorScheme[] = {
@@ -124,7 +123,7 @@ int main()
     Color backgroundColor = BLACK, fontColor = WHITE, snakeHeadColor = DARKGREEN, snakeBodyColor = GREEN, foodColor = RED, gameOverColor = RED, scoreColor = ORANGE;
 
     // Initiliaze window and set default FPS
-    InitWindow(screenWidth, screenHeight, TextFormat("Snake\t%dx%d",screenWidth,screenHeight));
+    InitWindow(screenWidth, screenHeight, TextFormat("Snake\t%dx%d", screenWidth, screenHeight));
     SetTargetFPS(fps);
 
     // Initialize Audio Devices
@@ -226,37 +225,48 @@ int main()
                     snake[0].directionX = 0;
                     snake[0].directionY = 1;
                 };
-                if(IsKeyPressed(KEY_K)){
+
+                if (IsKeyPressed(KEY_K))
+                {
                     devAdv = !devAdv;
                 }
                 // GameLogic
-                
-                //Hamilton circuit
-                if(devAdv == true){
 
-                if(snake[0].x>=screenWidth-blockSize && snake[0].directionX==1 && snake[0].directionY==0){
-                snake[0].directionX = 0;
-                snake[0].directionY = 1;
+                // Hamilton circuit
+                if (devAdv == true)
+                {
+
+                    if (snake[0].x >= screenWidth - blockSize && snake[0].directionX == 1 && snake[0].directionY == 0)
+                    {
+                        snake[0].directionX = 0;
+                        snake[0].directionY = 1;
+                    }
+                    else if (snake[0].x >= screenWidth - blockSize && snake[0].directionX == 0 && snake[0].directionY == 1)
+                    {
+                        snake[0].directionX = -1;
+                        snake[0].directionY = 0;
+                    }
+                    else if (snake[0].x <= blockSize && snake[0].directionX == -1 && snake[0].directionY == 0 && snake[0].y < screenHeight - blockSize)
+                    {
+                        snake[0].directionX = 0;
+                        snake[0].directionY = 1;
+                    }
+                    else if (snake[0].x <= blockSize && snake[0].directionX == 0 && snake[0].directionY == 1)
+                    {
+                        snake[0].directionX = 1;
+                        snake[0].directionY = 0;
+                    }
+                    else if (snake[0].x < blockSize && snake[0].directionX == -1 && snake[0].directionY == 0 && snake[0].y >= screenHeight - blockSize)
+                    {
+                        snake[0].directionX = 0;
+                        snake[0].directionY = -1;
+                    }
+                    else if (snake[0].x < blockSize && snake[0].directionX == 0 && snake[0].directionY == -1 && snake[0].y < blockSize)
+                    {
+                        snake[0].directionX = 1;
+                        snake[0].directionY = 0;
+                    }
                 }
-                else if(snake[0].x>=screenWidth-blockSize && snake[0].directionX==0 && snake[0].directionY==1){
-                snake[0].directionX = -1;
-                snake[0].directionY = 0;
-                }else if(snake[0].x<=blockSize && snake[0].directionX==-1 && snake[0].directionY==0 && snake[0].y<screenHeight - blockSize){
-                snake[0].directionX = 0;
-                snake[0].directionY = 1;
-                }else if(snake[0].x<=blockSize && snake[0].directionX==0 && snake[0].directionY==1){
-                snake[0].directionX = 1;
-                snake[0].directionY = 0;
-                }else if(snake[0].x<blockSize && snake[0].directionX==-1 && snake[0].directionY==0 && snake[0].y>=screenHeight-blockSize){
-                snake[0].directionX = 0;
-                snake[0].directionY = -1;
-                }
-                else if(snake[0].x<blockSize && snake[0].directionX==0 && snake[0].directionY==-1 && snake[0].y<blockSize){
-                snake[0].directionX = 1;
-                snake[0].directionY = 0;
-                }
-            }
-                
 
                 // Check for Walls
                 if (!snake[0].check(screenWidth, screenHeight) && walls)
@@ -301,9 +311,66 @@ int main()
                 ClearBackground(backgroundColor);
 
                 // Draw snake body
-                for (int i = 1; i < snake.size(); i++)
+                for (int i = 1; i < snake.size() - 1; i++)
                 {
-                    DrawRectangle(snake[i].x, snake[i].y, blockSize, blockSize, snakeBodyColor);
+                    if (i == snake.size() - 1)
+                    {
+
+                        int offset[4] = {1, 1, 1, 1};
+                        if (snake[snake.size()].directionX == 1)
+                        {
+                            offset[1] = 0;
+                        }
+                        else if (snake[snake.size()].directionX == -1)
+                        {
+                            offset[0] = 0;
+                        }
+                        else if (snake[snake.size()].directionY == 1)
+                        {
+                            offset[3] = 0;
+                        }
+                        else if (snake[snake.size()].directionY == -1)
+                        {
+                            offset[2] = 0;
+                        }
+                        DrawRectangle(snake[snake.size()].x + offset[0], snake[snake.size()].y + offset[2], blockSize - 2 * offset[1], blockSize - 2 * offset[3], snakeBodyColor);
+                    }
+                    else
+                    {
+
+                        int offset[4] = {0, 0, 0, 0};
+                        if (snake[i - 1].y == snake[i + 1].y)
+                        {
+                            offset[2] = 1;
+                            offset[3] = 2;
+                        }
+                        else if (snake[i - 1].x == snake[i + 1].x)
+                        {
+                            offset[0] = 1;
+                            offset[1] = 2;
+                        }
+                        else if ((snake[i + 1].directionX == 1 && snake[i].directionY == 1) || (snake[i + 1].directionY == -1 && snake[i].directionX == -1))
+                        {
+                            offset[1] = 1;
+                            offset[2] = 1;
+                        }
+                        else if ((snake[i + 1].directionX == 1 && snake[i].directionY == -1) || (snake[i + 1].directionY == 1 && snake[i].directionX == -1))
+                        {
+                            offset[1] = 1;
+                            offset[3] = 1;
+                        }
+                        else if ((snake[i + 1].directionY == 1 && snake[i].directionX == 1) || (snake[i + 1].directionX == -1 && snake[i].directionY == -1))
+                        {
+                            offset[0] = 1;
+                            offset[3] = 1;
+                        }
+                        else if ((snake[i + 1].directionY == -1 && snake[i].directionX == 1) || (snake[i + 1].directionX == -1 && snake[i].directionY == 1))
+                        {
+                            offset[0] = 1;
+                            offset[2] = 1;
+                        }
+                        DrawRectangle(snake[i].x + offset[0], snake[i].y + offset[2], blockSize - offset[1], blockSize - offset[3], snakeBodyColor);
+                    }
                 }
 
                 // Display Score
@@ -342,10 +409,68 @@ int main()
                 ClearBackground(backgroundColor);
 
                 // Draw Dead Snake Body And Head
-                for (int i = 1; i < snake.size(); i++)
+                for (int i = 1; i < snake.size() - 1; i++)
                 {
-                    DrawRectangle(snake[i].x, snake[i].y, blockSize, blockSize, GRAY);
+                    if (i == snake.size() - 1)
+                    {
+
+                        int offset[4] = {1, 1, 1, 1};
+                        if (snake[snake.size()].directionX == 1)
+                        {
+                            offset[1] = 0;
+                        }
+                        else if (snake[snake.size()].directionX == -1)
+                        {
+                            offset[0] = 0;
+                        }
+                        else if (snake[snake.size()].directionY == 1)
+                        {
+                            offset[3] = 0;
+                        }
+                        else if (snake[snake.size()].directionY == -1)
+                        {
+                            offset[2] = 0;
+                        }
+                        DrawRectangle(snake[snake.size()].x + offset[0], snake[snake.size()].y + offset[2], blockSize - 2 * offset[1], blockSize - 2 * offset[3], GRAY);
+                    }
+                    else
+                    {
+
+                        int offset[4] = {0, 0, 0, 0};
+                        if (snake[i - 1].y == snake[i + 1].y)
+                        {
+                            offset[2] = 1;
+                            offset[3] = 2;
+                        }
+                        else if (snake[i - 1].x == snake[i + 1].x)
+                        {
+                            offset[0] = 1;
+                            offset[1] = 2;
+                        }
+                        else if ((snake[i + 1].directionX == 1 && snake[i].directionY == 1) || (snake[i + 1].directionY == -1 && snake[i].directionX == -1))
+                        {
+                            offset[1] = 1;
+                            offset[2] = 1;
+                        }
+                        else if ((snake[i + 1].directionX == 1 && snake[i].directionY == -1) || (snake[i + 1].directionY == 1 && snake[i].directionX == -1))
+                        {
+                            offset[1] = 1;
+                            offset[3] = 1;
+                        }
+                        else if ((snake[i + 1].directionY == 1 && snake[i].directionX == 1) || (snake[i + 1].directionX == -1 && snake[i].directionY == -1))
+                        {
+                            offset[0] = 1;
+                            offset[3] = 1;
+                        }
+                        else if ((snake[i + 1].directionY == -1 && snake[i].directionX == 1) || (snake[i + 1].directionX == -1 && snake[i].directionY == 1))
+                        {
+                            offset[0] = 1;
+                            offset[2] = 1;
+                        }
+                        DrawRectangle(snake[i].x + offset[0], snake[i].y + offset[2], blockSize - offset[1], blockSize - offset[3], GRAY);
+                    }
                 }
+
                 DrawRectangle(snake[0].x, snake[0].y, blockSize, blockSize, DARKGRAY);
 
                 // Draw Outline
@@ -481,10 +606,10 @@ int main()
                 // Change FPS
                 case 0:
                     fps += 5;
-                    if (fps > 40)
+                    if (fps > 500)
                         fps = 5;
                     if (fps < 5)
-                        fps = 40;
+                        fps = 500;
                     break;
 
                 // Toggle Wall
@@ -665,8 +790,8 @@ int main()
                 // Toggle Block size
                 case 1:
                     blockSize = blockSize == 10 ? 20 : 10;
-                    
-                    //Regenerate food to factor in block size change
+
+                    // Regenerate food to factor in block size change
                     food.x = randGen(screenWidth, blockSize);
                     food.y = randGen(screenHeight, blockSize);
                     break;
@@ -676,13 +801,13 @@ int main()
                     screenWidth += 200;
                     if (screenWidth > 1200)
                         screenWidth = 600;
-                    
-                    //Regenerate food to factor in screenwidth change
+
+                    // Regenerate food to factor in screenwidth change
                     food.x = randGen(screenWidth, blockSize);
 
                     // Reintialize window
                     CloseWindow();
-                    InitWindow(screenWidth, screenHeight, TextFormat("Snake\t%dx%d",screenWidth,screenHeight));
+                    InitWindow(screenWidth, screenHeight, TextFormat("Snake\t%dx%d", screenWidth, screenHeight));
                     break;
 
                 // Chnage Screen Height
@@ -691,12 +816,12 @@ int main()
                     if (screenHeight > 900)
                         screenHeight = 500;
 
-                    //Regenerate food to factor in screenheight change
+                    // Regenerate food to factor in screenheight change
                     food.y = randGen(screenHeight, blockSize);
-                    
+
                     // Reintialize window
                     CloseWindow();
-                    InitWindow(screenWidth, screenHeight, TextFormat("Snake\t%dx%d",screenWidth,screenHeight));
+                    InitWindow(screenWidth, screenHeight, TextFormat("Snake\t%dx%d", screenWidth, screenHeight));
                     break;
 
                 // Change Font Size
@@ -719,19 +844,18 @@ int main()
             }
         }
 
-        //Main Menu
+        // Main Menu
         else if (menuMode == 6)
         {
             // Draw to game and clear backgrtound
             BeginDrawing();
             ClearBackground(backgroundColor);
 
-
-            //Display Text
+            // Display Text
             DrawText("Use SPACE for next", (screenWidth - (MeasureText(TextFormat("Use SPACE for next"), fontSize * 1.5))) / 2, blockSize, fontSize * 1.5, fontColor);
             DrawText("Use ENTER to select", (screenWidth - (MeasureText(TextFormat("Use ENTER to select"), fontSize * 1.5))) / 2, blockSize + fontSize * 1.5, fontSize * 1.5, fontColor);
-            
-            //Draw Outline
+
+            // Draw Outline
             DrawRectangleLines(boxOffset, boxOffset, screenWidth - boxOffset * 2, screenHeight - boxOffset * 2, fontColor);
 
             // Menu Items
@@ -744,7 +868,7 @@ int main()
                 "CONFIG",
                 "QUIT"};
             int modes = sizeof(options) / sizeof(options[0]), spacing = ((screenHeight - 2 * boxOffset) - (modes)*fontSize) / (modes + 1);
-            
+
             // Render Menu Items
             for (int i = 0; i < modes; i++)
             {
@@ -776,27 +900,27 @@ int main()
             {
                 switch (currMode)
                 {
-                
-                //Show Scoreboard
+
+                // Show Scoreboard
                 case 0:
                     menuMode = 0;
                     break;
 
-                //Play on Easy
+                // Play on Easy
                 case 1:
                     walls = false;
                     selfHarm = true;
                     menuMode = 1;
                     break;
 
-                //Play on Medium
+                // Play on Medium
                 case 2:
                     walls = true;
                     selfHarm = true;
                     menuMode = 2;
                     break;
 
-                //Play on hard
+                // Play on hard
                 case 3:
                     walls = true;
                     selfHarm = true;
@@ -804,17 +928,17 @@ int main()
                     menuMode = 3;
                     break;
 
-                //Configure Sandbox
+                // Configure Sandbox
                 case 4:
                     menuMode = 4;
                     break;
 
-                //Configure window options
+                // Configure window options
                 case 5:
                     menuMode = 5;
                     break;
 
-                //Quit Game
+                // Quit Game
                 case 6:
                     CloseWindow();
                     break;
@@ -825,10 +949,10 @@ int main()
         }
     }
 
-    //Unload Assets and close game entirely
+    // Unload Assets and close game entirely
     UnloadSound(gameOverSound);
     UnloadSound(biteSound);
     CloseAudioDevice();
     CloseWindow();
     return 0;
-}   
+}
