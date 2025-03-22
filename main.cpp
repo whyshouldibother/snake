@@ -118,7 +118,9 @@ int main()
         "DARK3",
         "DARK4",
         "DARK5",
-        "LIGHT"};
+        "LIGHT",
+        "RIZZLER",
+    };
 
     // Window Default colors
     Color backgroundColor = BLACK, fontColor = WHITE, snakeHeadColor = DARKGREEN, snakeBodyColor = GREEN, foodColor = RED, gameOverColor = RED, scoreColor = ORANGE;
@@ -715,9 +717,10 @@ int main()
                     if (colorSchemeIndex >= sizeof(colorScheme) / sizeof(colorScheme[0]))
                         colorSchemeIndex = 0;
 
-                    // DARK1
-                    if (colorSchemeIndex == 0)
-                    {
+                    switch(colorSchemeIndex){
+
+                        // DARK1
+                    case 0:
                         backgroundColor = BLACK;
                         fontColor = WHITE;
                         snakeHeadColor = DARKGREEN;
@@ -725,11 +728,10 @@ int main()
                         foodColor = RED;
                         gameOverColor = RED;
                         scoreColor = ORANGE;
-                    }
+                        break;
 
-                    // DARK2
-                    if (colorSchemeIndex == 1)
-                    {
+                    
+                    case 1:
                         backgroundColor = BLACK;
                         fontColor = WHITE;
                         snakeHeadColor = DARKBLUE;
@@ -737,11 +739,10 @@ int main()
                         foodColor = RED;
                         gameOverColor = RED;
                         scoreColor = ORANGE;
-                    }
+                        break;
 
                     // DARK3
-                    if (colorSchemeIndex == 2)
-                    {
+                    case 2:
                         backgroundColor = BLACK;
                         fontColor = WHITE;
                         snakeHeadColor = DARKPURPLE;
@@ -749,11 +750,10 @@ int main()
                         foodColor = LIME;
                         gameOverColor = RED;
                         scoreColor = ORANGE;
-                    }
+                        break;
 
                     // DARK4
-                    if (colorSchemeIndex == 3)
-                    {
+                    case 3:
                         backgroundColor = BLACK;
                         fontColor = WHITE;
                         snakeHeadColor = GREEN;
@@ -761,11 +761,10 @@ int main()
                         foodColor = YELLOW;
                         gameOverColor = RED;
                         scoreColor = ORANGE;
-                    }
+                        break;
 
+                    case 4:
                     // DARK5
-                    if (colorSchemeIndex == 4)
-                    {
                         backgroundColor = BLACK;
                         fontColor = WHITE;
                         snakeHeadColor = LIGHTGRAY;
@@ -773,11 +772,10 @@ int main()
                         foodColor = DARKGRAY;
                         gameOverColor = DARKGRAY;
                         scoreColor = GRAY;
-                    }
+                        break;
 
                     // Light
-                    if (colorSchemeIndex == 5)
-                    {
+                    case 5:
                         backgroundColor = WHITE;
                         fontColor = BLACK;
                         snakeHeadColor = DARKGREEN;
@@ -785,7 +783,19 @@ int main()
                         foodColor = RED;
                         gameOverColor = RED;
                         scoreColor = ORANGE;
-                    }
+                        break;
+                    
+                    //Rizzler
+                    case 6:
+                        backgroundColor = Color{255, 252, 239, 255};
+                        fontColor = Color{92, 137, 157,255};
+                        snakeHeadColor = Color{252,194, 0 , 255};
+                        snakeBodyColor = Color{92, 137, 157,255};
+                        foodColor = Color{111,60,137, 255};
+                        gameOverColor = GREEN;
+                        scoreColor = PINK;
+                        break;
+                }
                     break;
 
                 // Toggle Block size
