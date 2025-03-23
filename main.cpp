@@ -1,13 +1,10 @@
 #include "raylib.h"
-#include "rlgl.h"
 #include <cstdlib>
 #include <random>
 #include <iostream>
 #include <vector>
 #include <cstring>
 #include <fstream>
-#include <cstdlib>
-#include <ctime>
 using namespace std;
 
 // Randomizer
