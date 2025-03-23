@@ -1,25 +1,24 @@
 #include "raylib.h"
+#include "rlgl.h"
 #include <cstdlib>
 #include <random>
 #include <iostream>
 #include <vector>
 #include <cstring>
 #include <fstream>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 
 // Randomizer
+random_device rd;
+mt19937 mt(rd());
+// Return coordinates
+
 int randGen(int max, int blockSize)
 {
-
-    // Random number engine
-    random_device rd;
-    mt19937 mt(rd());
-
-    // Get a number between 5 to maxium of the blocksize of 5
-    uniform_int_distribution<int> dist(5, max / blockSize - 5);
-
-    // Return coordinates
-    return dist(mt) * blockSize;
+    uniform_int_distribution<int> dist(0, max / blockSize - 1);
+    return (dist(rd) * blockSize);
 }
 
 class entity
@@ -48,7 +47,7 @@ public:
             x = 0;
             return false;
         }
-        if (x < 0)
+        else if (x < 0)
         {
             x = screenWidth;
             return false;
@@ -58,7 +57,7 @@ public:
             y = 0;
             return false;
         }
-        if (y < 0)
+        else if (y < 0)
         {
             y = screenHeight;
             return false;
@@ -74,15 +73,18 @@ public:
     }
 
     // Grow entity if food is eaten
-    bool grow(entity *food, int maxX, int maxY, int blockSize, vector<entity> snake)
+    bool grow(entity *food, int maxX, int maxY, int blockSize, vector<entity> snake, int score)
     {
         if (x == food->x && y == food->y)
         {
-            foodGen:
-            // Regenerate food
+            bool maxScore = score >= (maxX * maxY) / (blockSize * blockSize) - 1;
+        foodGen: // Regenerate food
             food->x = randGen(maxX, blockSize);
             food->y = randGen(maxY, blockSize);
-            for(int i=0; i<snake.size(); i++) if(snake[i].x==food->x && snake[i].y==food->y) goto foodGen;
+            if (!maxScore)
+                for (int i = 0; i < snake.size(); i++)
+                    if (snake[i].x == food->x && snake[i].y == food->y)
+                        goto foodGen;
             return true;
         }
         else
@@ -111,19 +113,26 @@ int main()
 
     bool devAdv = false; // for dev
 
+    int maxFps = 500;
     // Available Color Schemes
     const char *colorScheme[] = {
+        "RIZZLER",
         "DARK1",
         "DARK2",
         "DARK3",
         "DARK4",
         "DARK5",
         "LIGHT",
-        "RIZZLER",
     };
 
     // Window Default colors
-    Color backgroundColor = BLACK, fontColor = WHITE, snakeHeadColor = DARKGREEN, snakeBodyColor = GREEN, foodColor = RED, gameOverColor = RED, scoreColor = ORANGE;
+    Color backgroundColor = Color{255, 252, 239, 255},
+          fontColor = Color{92, 137, 157, 255},
+          snakeHeadColor = Color{252, 194, 0, 255},
+          snakeBodyColor = Color{92, 137, 157, 255},
+          foodColor = Color{111, 60, 137, 255},
+          gameOverColor = GREEN,
+          scoreColor = PINK;
 
     // Initiliaze window and set default FPS
     InitWindow(screenWidth, screenHeight, TextFormat("Snake\t%dx%d", screenWidth, screenHeight));
@@ -140,7 +149,8 @@ int main()
 
     // Create Snake vector and add snake head to vector
     vector<entity> snake;
-    snake.push_back(entity(randGen(screenWidth, blockSize), randGen(screenHeight, blockSize)));
+    snake.reserve(1000 * sizeof(entity));
+    snake.push_back(entity(screenWidth / 2, screenHeight / 2));
 
     // Main game loop Run Until Close is triggered
     while (!WindowShouldClose())
@@ -280,7 +290,7 @@ int main()
                 }
 
                 // Check Growth
-                if (snake[0].grow(&food, screenWidth, screenHeight, blockSize, snake))
+                if (snake[0].grow(&food, screenWidth, screenHeight, blockSize, snake, score))
                 {
                     // Grow snake
                     PlaySound(biteSound);
@@ -313,69 +323,66 @@ int main()
                 BeginDrawing();
                 ClearBackground(backgroundColor);
 
-                // Draw snake body
+                // Draw snake
                 for (int i = 1; i < snake.size() - 1; i++)
                 {
-                    if (i == snake.size() - 1)
-                    {
 
-                        int offset[4] = {1, 1, 1, 1};
-                        if (snake[snake.size()].directionX == 1)
-                        {
-                            offset[1] = 0;
-                        }
-                        else if (snake[snake.size()].directionX == -1)
-                        {
-                            offset[0] = 0;
-                        }
-                        else if (snake[snake.size()].directionY == 1)
-                        {
-                            offset[3] = 0;
-                        }
-                        else if (snake[snake.size()].directionY == -1)
-                        {
-                            offset[2] = 0;
-                        }
-                        DrawRectangle(snake[snake.size()].x + offset[0], snake[snake.size()].y + offset[2], blockSize - 2 * offset[1], blockSize - 2 * offset[3], snakeBodyColor);
-                    }
-                    else
+                    int offset[4] = {0, 0, 0, 0};
+                    if (snake[i - 1].y == snake[i + 1].y)
                     {
-
-                        int offset[4] = {0, 0, 0, 0};
-                        if (snake[i - 1].y == snake[i + 1].y)
-                        {
-                            offset[2] = 1;
-                            offset[3] = 2;
-                        }
-                        else if (snake[i - 1].x == snake[i + 1].x)
-                        {
-                            offset[0] = 1;
-                            offset[1] = 2;
-                        }
-                        else if ((snake[i + 1].directionX == 1 && snake[i].directionY == 1) || (snake[i + 1].directionY == -1 && snake[i].directionX == -1))
-                        {
-                            offset[1] = 1;
-                            offset[2] = 1;
-                        }
-                        else if ((snake[i + 1].directionX == 1 && snake[i].directionY == -1) || (snake[i + 1].directionY == 1 && snake[i].directionX == -1))
-                        {
-                            offset[1] = 1;
-                            offset[3] = 1;
-                        }
-                        else if ((snake[i + 1].directionY == 1 && snake[i].directionX == 1) || (snake[i + 1].directionX == -1 && snake[i].directionY == -1))
-                        {
-                            offset[0] = 1;
-                            offset[3] = 1;
-                        }
-                        else if ((snake[i + 1].directionY == -1 && snake[i].directionX == 1) || (snake[i + 1].directionX == -1 && snake[i].directionY == 1))
-                        {
-                            offset[0] = 1;
-                            offset[2] = 1;
-                        }
-                        DrawRectangle(snake[i].x + offset[0], snake[i].y + offset[2], blockSize - offset[1], blockSize - offset[3], snakeBodyColor);
+                        offset[2] = 1;
+                        offset[3] = 2;
                     }
+                    else if (snake[i - 1].x == snake[i + 1].x)
+                    {
+                        offset[0] = 1;
+                        offset[1] = 2;
+                    }
+                    else if ((snake[i + 1].directionX == 1 && snake[i].directionY == 1) || (snake[i + 1].directionY == -1 && snake[i].directionX == -1))
+                    {
+                        offset[1] = 1;
+                        offset[2] = 1;
+                    }
+                    else if ((snake[i + 1].directionX == 1 && snake[i].directionY == -1) || (snake[i + 1].directionY == 1 && snake[i].directionX == -1))
+                    {
+                        offset[1] = 1;
+                        offset[3] = 1;
+                    }
+                    else if ((snake[i + 1].directionY == 1 && snake[i].directionX == 1) || (snake[i + 1].directionX == -1 && snake[i].directionY == -1))
+                    {
+                        offset[0] = 1;
+                        offset[3] = 1;
+                    }
+                    else if ((snake[i + 1].directionY == -1 && snake[i].directionX == 1) || (snake[i + 1].directionX == -1 && snake[i].directionY == 1))
+                    {
+                        offset[0] = 1;
+                        offset[2] = 1;
+                    }
+                    DrawRectangle(snake[i].x + offset[0], snake[i].y + offset[2], blockSize - offset[1], blockSize - offset[3], snakeBodyColor);
                 }
 
+                if (snake.size() > 1)
+                {
+
+                    int offset[4] = {1, 1, 1, 1};
+                    if (snake[snake.size() - 1].directionX == 1)
+                    {
+                        offset[1] = 0;
+                    }
+                    else if (snake[snake.size() - 1].directionX == -1)
+                    {
+                        offset[0] = 0;
+                    }
+                    else if (snake[snake.size() - 1].directionY == 1)
+                    {
+                        offset[3] = 0;
+                    }
+                    else if (snake[snake.size() - 1].directionY == -1)
+                    {
+                        offset[2] = 0;
+                    }
+                    DrawRectangle(snake[snake.size() - 1].x + offset[0], snake[snake.size() - 1].y + offset[2], blockSize - 2 * offset[1], blockSize - 2 * offset[3], snakeBodyColor);
+                }
                 // Display Score
                 DrawText(TextFormat("Score:%d", score), screenWidth - MeasureText(TextFormat("Score:%d", score), fontSize), 0, fontSize, fontColor);
 
@@ -414,66 +421,63 @@ int main()
                 // Draw Dead Snake Body And Head
                 for (int i = 1; i < snake.size() - 1; i++)
                 {
-                    if (i == snake.size() - 1)
-                    {
 
-                        int offset[4] = {1, 1, 1, 1};
-                        if (snake[snake.size()].directionX == 1)
-                        {
-                            offset[1] = 0;
-                        }
-                        else if (snake[snake.size()].directionX == -1)
-                        {
-                            offset[0] = 0;
-                        }
-                        else if (snake[snake.size()].directionY == 1)
-                        {
-                            offset[3] = 0;
-                        }
-                        else if (snake[snake.size()].directionY == -1)
-                        {
-                            offset[2] = 0;
-                        }
-                        DrawRectangle(snake[snake.size()].x + offset[0], snake[snake.size()].y + offset[2], blockSize - 2 * offset[1], blockSize - 2 * offset[3], GRAY);
-                    }
-                    else
+                    int offset[4] = {0, 0, 0, 0};
+                    if (snake[i - 1].y == snake[i + 1].y)
                     {
-
-                        int offset[4] = {0, 0, 0, 0};
-                        if (snake[i - 1].y == snake[i + 1].y)
-                        {
-                            offset[2] = 1;
-                            offset[3] = 2;
-                        }
-                        else if (snake[i - 1].x == snake[i + 1].x)
-                        {
-                            offset[0] = 1;
-                            offset[1] = 2;
-                        }
-                        else if ((snake[i + 1].directionX == 1 && snake[i].directionY == 1) || (snake[i + 1].directionY == -1 && snake[i].directionX == -1))
-                        {
-                            offset[1] = 1;
-                            offset[2] = 1;
-                        }
-                        else if ((snake[i + 1].directionX == 1 && snake[i].directionY == -1) || (snake[i + 1].directionY == 1 && snake[i].directionX == -1))
-                        {
-                            offset[1] = 1;
-                            offset[3] = 1;
-                        }
-                        else if ((snake[i + 1].directionY == 1 && snake[i].directionX == 1) || (snake[i + 1].directionX == -1 && snake[i].directionY == -1))
-                        {
-                            offset[0] = 1;
-                            offset[3] = 1;
-                        }
-                        else if ((snake[i + 1].directionY == -1 && snake[i].directionX == 1) || (snake[i + 1].directionX == -1 && snake[i].directionY == 1))
-                        {
-                            offset[0] = 1;
-                            offset[2] = 1;
-                        }
-                        DrawRectangle(snake[i].x + offset[0], snake[i].y + offset[2], blockSize - offset[1], blockSize - offset[3], GRAY);
+                        offset[2] = 1;
+                        offset[3] = 2;
                     }
+                    else if (snake[i - 1].x == snake[i + 1].x)
+                    {
+                        offset[0] = 1;
+                        offset[1] = 2;
+                    }
+                    else if ((snake[i + 1].directionX == 1 && snake[i].directionY == 1) || (snake[i + 1].directionY == -1 && snake[i].directionX == -1))
+                    {
+                        offset[1] = 1;
+                        offset[2] = 1;
+                    }
+                    else if ((snake[i + 1].directionX == 1 && snake[i].directionY == -1) || (snake[i + 1].directionY == 1 && snake[i].directionX == -1))
+                    {
+                        offset[1] = 1;
+                        offset[3] = 1;
+                    }
+                    else if ((snake[i + 1].directionY == 1 && snake[i].directionX == 1) || (snake[i + 1].directionX == -1 && snake[i].directionY == -1))
+                    {
+                        offset[0] = 1;
+                        offset[3] = 1;
+                    }
+                    else if ((snake[i + 1].directionY == -1 && snake[i].directionX == 1) || (snake[i + 1].directionX == -1 && snake[i].directionY == 1))
+                    {
+                        offset[0] = 1;
+                        offset[2] = 1;
+                    }
+                    DrawRectangle(snake[i].x + offset[0], snake[i].y + offset[2], blockSize - offset[1], blockSize - offset[3], GRAY);
                 }
 
+                if (snake.size() > 1)
+                {
+
+                    int offset[4] = {1, 1, 1, 1};
+                    if (snake[snake.size() - 1].directionX == 1)
+                    {
+                        offset[1] = 0;
+                    }
+                    else if (snake[snake.size() - 1].directionX == -1)
+                    {
+                        offset[0] = 0;
+                    }
+                    else if (snake[snake.size() - 1].directionY == 1)
+                    {
+                        offset[3] = 0;
+                    }
+                    else if (snake[snake.size() - 1].directionY == -1)
+                    {
+                        offset[2] = 0;
+                    }
+                    DrawRectangle(snake[snake.size()].x + offset[0], snake[snake.size()].y + offset[2], blockSize - 2 * offset[1], blockSize - 2 * offset[3], GRAY);
+                }
                 DrawRectangle(snake[0].x, snake[0].y, blockSize, blockSize, DARKGRAY);
 
                 // Draw Outline
@@ -521,7 +525,7 @@ int main()
                         score = 0;
                         gameOver = false;
                         snake.clear();
-                        snake.push_back(entity(randGen(screenWidth, blockSize), randGen(screenHeight, blockSize)));
+                        snake.push_back(entity(screenWidth / 2, screenHeight / 2));
                         break;
 
                     // Quit to main menu
@@ -608,11 +612,8 @@ int main()
 
                 // Change FPS
                 case 0:
+                    fps %= maxFps;
                     fps += 5;
-                    if (fps > 500)
-                        fps = 5;
-                    if (fps < 5)
-                        fps = 500;
                     break;
 
                 // Toggle Wall
@@ -717,10 +718,21 @@ int main()
                     if (colorSchemeIndex >= sizeof(colorScheme) / sizeof(colorScheme[0]))
                         colorSchemeIndex = 0;
 
-                    switch(colorSchemeIndex){
+                    switch (colorSchemeIndex)
+                    {
 
-                        // DARK1
+                        // Rizzler
                     case 0:
+                        backgroundColor = Color{255, 252, 239, 255};
+                        fontColor = Color{92, 137, 157, 255};
+                        snakeHeadColor = Color{252, 194, 0, 255};
+                        snakeBodyColor = Color{92, 137, 157, 255};
+                        foodColor = Color{111, 60, 137, 255};
+                        gameOverColor = GREEN;
+                        scoreColor = PINK;
+                        break;
+                        // DARK1
+                    case 1:
                         backgroundColor = BLACK;
                         fontColor = WHITE;
                         snakeHeadColor = DARKGREEN;
@@ -730,8 +742,7 @@ int main()
                         scoreColor = ORANGE;
                         break;
 
-                    
-                    case 1:
+                    case 2:
                         backgroundColor = BLACK;
                         fontColor = WHITE;
                         snakeHeadColor = DARKBLUE;
@@ -742,7 +753,7 @@ int main()
                         break;
 
                     // DARK3
-                    case 2:
+                    case 3:
                         backgroundColor = BLACK;
                         fontColor = WHITE;
                         snakeHeadColor = DARKPURPLE;
@@ -753,7 +764,7 @@ int main()
                         break;
 
                     // DARK4
-                    case 3:
+                    case 4:
                         backgroundColor = BLACK;
                         fontColor = WHITE;
                         snakeHeadColor = GREEN;
@@ -763,8 +774,8 @@ int main()
                         scoreColor = ORANGE;
                         break;
 
-                    case 4:
-                    // DARK5
+                    case 5:
+                        // DARK5
                         backgroundColor = BLACK;
                         fontColor = WHITE;
                         snakeHeadColor = LIGHTGRAY;
@@ -775,7 +786,7 @@ int main()
                         break;
 
                     // Light
-                    case 5:
+                    case 6:
                         backgroundColor = WHITE;
                         fontColor = BLACK;
                         snakeHeadColor = DARKGREEN;
@@ -784,20 +795,8 @@ int main()
                         gameOverColor = RED;
                         scoreColor = ORANGE;
                         break;
-                    
-                    //Rizzler
-                    case 6:
-                        backgroundColor = Color{255, 252, 239, 255};
-                        fontColor = Color{92, 137, 157,255};
-                        snakeHeadColor = Color{252,194, 0 , 255};
-                        snakeBodyColor = Color{92, 137, 157,255};
-                        foodColor = Color{111,60,137, 255};
-                        gameOverColor = GREEN;
-                        scoreColor = PINK;
-                        break;
-                }
+                    }
                     break;
-
                 // Toggle Block size
                 case 1:
                     blockSize = blockSize == 10 ? 20 : 10;
