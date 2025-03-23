@@ -95,6 +95,24 @@ public:
     }
 };
 
+bool controlSwitcherLR(int *change, int min, int max, int h)
+{
+    if (IsKeyPressed(KEY_ENTER) || IsKeyDown(KEY_RIGHT) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+    {
+        *change += h;
+        if (*change > max)
+            *change = min;
+        return true;
+    }
+    else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_LEFT_SHIFT))
+    {
+        *change -= h;
+        if (*change < min)
+            *change = max;
+        return true;
+    }
+    return false;
+}
 // Driver code
 int main()
 {
@@ -204,7 +222,7 @@ int main()
         }
 
         // Run game for menuModes 1 2 3 can be collapsed to one number
-        else if (menuMode >= 1 && menuMode <= 3)
+        else if (menuMode == 1)
         {
 
             // While not gameover
@@ -548,6 +566,8 @@ int main()
         // Configure settings for sandbox mode
         else if (menuMode == 4)
         {
+            if (GetFPS() > 10)
+                SetTargetFPS(10);
             // Draw to game and clear backgrtound
             BeginDrawing();
             ClearBackground(backgroundColor);
@@ -602,49 +622,54 @@ int main()
                 currMode = 0;
 
             // Check for enter or mouse click to trigger menu select
-            if (IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            switch (currMode)
             {
-                switch (currMode)
-                {
 
-                // Change FPS
-                case 0:
-                    fps %= maxFps;
-                    fps += 5;
-                    break;
+            // Change FPS
+            case 0:
+                controlSwitcherLR(&fps, 5, maxFps, 5);
+                break;
 
-                // Toggle Wall
-                case 1:
-                    walls = !walls;
-                    break;
+            // Toggle Wall
+            default:
+                if (IsKeyPressed(KEY_ENTER))
+                    switch (currMode)
+                    {
 
-                // Toggle Self Harm
-                case 2:
-                    selfHarm = !selfHarm;
-                    break;
+                    case 1:
+                        walls = !walls;
+                        break;
 
-                // Play
-                case 3:
-                    SetTargetFPS(fps);
-                    menuMode = 2;
-                    break;
+                    // Toggle Self Harm
+                    case 2:
+                        selfHarm = !selfHarm;
+                        break;
 
-                // Quit to main menu
-                case 4:
-                    menuMode = 6;
-                    break;
+                        // Play
+                    case 3:
+                        SetTargetFPS(fps);
+                        menuMode = 1;
+                        snake.clear();
+                        break;
 
-                // Quit Game
-                case 5:
-                    CloseWindow();
-                    break;
-                }
+                    // Quit to main menu
+                    case 4:
+                        menuMode = 6;
+                        break;
+
+                    // Quit Game
+                    case 5:
+                        CloseWindow();
+                        break;
+                    }
             }
         }
 
         // Configure window options
         else if (menuMode == 5)
         {
+            if (GetFPS() != 10)
+                SetTargetFPS(10);
             // Draw to game and clear background
             BeginDrawing();
             ClearBackground(backgroundColor);
@@ -704,147 +729,144 @@ int main()
                 currMode = 0;
 
             // Check for enter or mouse click to trigger menu select
-            if (IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            switch (currMode)
             {
-                switch (currMode)
+
+            // Change Color Schemes
+            case 0:
+                controlSwitcherLR(&colorSchemeIndex, 0, sizeof(colorScheme) / sizeof(colorScheme[0]) - 1, 1);
+                switch (colorSchemeIndex)
                 {
-
-                // Change Color Schemes
+                // Rizzler
                 case 0:
-                    colorSchemeIndex++;
-                    if (colorSchemeIndex >= sizeof(colorScheme) / sizeof(colorScheme[0]))
-                        colorSchemeIndex = 0;
-
-                    switch (colorSchemeIndex)
-                    {
-
-                        // Rizzler
-                    case 0:
-                        backgroundColor = Color{255, 252, 239, 255};
-                        fontColor = Color{92, 137, 157, 255};
-                        snakeHeadColor = Color{252, 194, 0, 255};
-                        snakeBodyColor = Color{92, 137, 157, 255};
-                        foodColor = Color{111, 60, 137, 255};
-                        gameOverColor = GREEN;
-                        scoreColor = PINK;
-                        break;
-                        // DARK1
-                    case 1:
-                        backgroundColor = BLACK;
-                        fontColor = WHITE;
-                        snakeHeadColor = DARKGREEN;
-                        snakeBodyColor = GREEN;
-                        foodColor = RED;
-                        gameOverColor = RED;
-                        scoreColor = ORANGE;
-                        break;
-
-                    case 2:
-                        backgroundColor = BLACK;
-                        fontColor = WHITE;
-                        snakeHeadColor = DARKBLUE;
-                        snakeBodyColor = BLUE;
-                        foodColor = RED;
-                        gameOverColor = RED;
-                        scoreColor = ORANGE;
-                        break;
-
-                    // DARK3
-                    case 3:
-                        backgroundColor = BLACK;
-                        fontColor = WHITE;
-                        snakeHeadColor = DARKPURPLE;
-                        snakeBodyColor = PURPLE;
-                        foodColor = LIME;
-                        gameOverColor = RED;
-                        scoreColor = ORANGE;
-                        break;
-
-                    // DARK4
-                    case 4:
-                        backgroundColor = BLACK;
-                        fontColor = WHITE;
-                        snakeHeadColor = GREEN;
-                        snakeBodyColor = BLUE;
-                        foodColor = YELLOW;
-                        gameOverColor = RED;
-                        scoreColor = ORANGE;
-                        break;
-
-                    case 5:
-                        // DARK5
-                        backgroundColor = BLACK;
-                        fontColor = WHITE;
-                        snakeHeadColor = LIGHTGRAY;
-                        snakeBodyColor = GRAY;
-                        foodColor = DARKGRAY;
-                        gameOverColor = DARKGRAY;
-                        scoreColor = GRAY;
-                        break;
-
-                    // Light
-                    case 6:
-                        backgroundColor = WHITE;
-                        fontColor = BLACK;
-                        snakeHeadColor = DARKGREEN;
-                        snakeBodyColor = GREEN;
-                        foodColor = RED;
-                        gameOverColor = RED;
-                        scoreColor = ORANGE;
-                        break;
-                    }
+                    backgroundColor = Color{255, 252, 239, 255};
+                    fontColor = Color{92, 137, 157, 255};
+                    snakeHeadColor = Color{252, 194, 0, 255};
+                    snakeBodyColor = Color{92, 137, 157, 255};
+                    foodColor = Color{111, 60, 137, 255};
+                    gameOverColor = GREEN;
+                    scoreColor = PINK;
                     break;
-                // Toggle Block size
+                    // DARK1
                 case 1:
-                    blockSize = blockSize == 10 ? 20 : 10;
-
-                    // Regenerate food to factor in block size change
-                    food.x = randGen(screenWidth, blockSize);
-                    food.y = randGen(screenHeight, blockSize);
+                    backgroundColor = BLACK;
+                    fontColor = WHITE;
+                    snakeHeadColor = DARKGREEN;
+                    snakeBodyColor = GREEN;
+                    foodColor = RED;
+                    gameOverColor = RED;
+                    scoreColor = ORANGE;
                     break;
 
-                // Change Screen Width
                 case 2:
-                    screenWidth += 200;
-                    if (screenWidth > 1200)
-                        screenWidth = 600;
+                    backgroundColor = BLACK;
+                    fontColor = WHITE;
+                    snakeHeadColor = DARKBLUE;
+                    snakeBodyColor = BLUE;
+                    foodColor = RED;
+                    gameOverColor = RED;
+                    scoreColor = ORANGE;
+                    break;
+
+                // DARK3
+                case 3:
+                    backgroundColor = BLACK;
+                    fontColor = WHITE;
+                    snakeHeadColor = DARKPURPLE;
+                    snakeBodyColor = PURPLE;
+                    foodColor = LIME;
+                    gameOverColor = RED;
+                    scoreColor = ORANGE;
+                    break;
+
+                // DARK4
+                case 4:
+                    backgroundColor = BLACK;
+                    fontColor = WHITE;
+                    snakeHeadColor = GREEN;
+                    snakeBodyColor = BLUE;
+                    foodColor = YELLOW;
+                    gameOverColor = RED;
+                    scoreColor = ORANGE;
+                    break;
+
+                case 5:
+                    // DARK5
+                    backgroundColor = BLACK;
+                    fontColor = WHITE;
+                    snakeHeadColor = LIGHTGRAY;
+                    snakeBodyColor = GRAY;
+                    foodColor = DARKGRAY;
+                    gameOverColor = DARKGRAY;
+                    scoreColor = GRAY;
+                    break;
+
+                // Light
+                case 6:
+                    backgroundColor = WHITE;
+                    fontColor = BLACK;
+                    snakeHeadColor = DARKGREEN;
+                    snakeBodyColor = GREEN;
+                    foodColor = RED;
+                    gameOverColor = RED;
+                    scoreColor = ORANGE;
+                    break;
+                }
+                break;
+            // Toggle Block size
+            case 1:
+                controlSwitcherLR(&blockSize, 10, 20, 10);
+                // Regenerate food to factor in block size change
+                food.x = randGen(screenWidth, blockSize);
+                food.y = randGen(screenHeight, blockSize);
+                break;
+
+            // Change Screen Width
+            case 2:
+                if (controlSwitcherLR(&screenWidth, 600, 1200, 200))
+                {
 
                     // Regenerate food to factor in screenwidth change
                     food.x = randGen(screenWidth, blockSize);
-
+                    snake[0].x = screenWidth / 2;
                     // Reintialize window
                     CloseWindow();
                     InitWindow(screenWidth, screenHeight, TextFormat("Snake\t%dx%d", screenWidth, screenHeight));
-                    break;
+                }
+                break;
 
-                // Chnage Screen Height
-                case 3:
-                    screenHeight += 100;
-                    if (screenHeight > 900)
-                        screenHeight = 500;
+            // Chnage Screen Height
+            case 3:
+                if (controlSwitcherLR(&screenWidth, 500, 900, 100))
+                {
 
                     // Regenerate food to factor in screenheight change
                     food.y = randGen(screenHeight, blockSize);
-
+                    snake[0].y = screenHeight / 2;
                     // Reintialize window
                     CloseWindow();
                     InitWindow(screenWidth, screenHeight, TextFormat("Snake\t%dx%d", screenWidth, screenHeight));
-                    break;
+                }
+                break;
 
-                // Change Font Size
-                case 4:
-                    fontSize += 12;
-                    if (fontSize > 36)
-                        fontSize = 12;
-                    break;
+            // Change Font Size
+            case 4:
+                controlSwitcherLR(&fontSize, 12, 36, 12);
+                break;
 
-                // Quit to main menu
-                case 5:
+            // Quit to main menu
+            case 5:
+                if (IsKeyDown(KEY_ENTER))
+                {
                     menuMode = 6;
+                    SetTargetFPS(fps);
                     break;
+                }
 
-                // Quit Game
-                case 6:
+            // Quit Game
+            case 6:
+                if (IsKeyDown(KEY_ENTER))
+                {
                     CloseWindow();
                     break;
                 }
@@ -924,7 +946,7 @@ int main()
                 case 2:
                     walls = true;
                     selfHarm = true;
-                    menuMode = 2;
+                    menuMode = 1;
                     break;
 
                 // Play on hard
@@ -932,7 +954,7 @@ int main()
                     walls = true;
                     selfHarm = true;
                     SetTargetFPS(20);
-                    menuMode = 3;
+                    menuMode = 1;
                     break;
 
                 // Configure Sandbox
